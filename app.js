@@ -2,12 +2,13 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 
+const config = require('./.env/index')
+
 const feedRoutes = require('./routes/feed')
 const authRoutes = require('./routes/auth')
 
-const app = express()
 
-const MONGO_URI = 'mongodb+srv://brian:briantest@cluster0.vv8md.mongodb.net/messages'
+const app = express()
 
 app.use(bodyParser.urlencoded({ extended: true })) // x-www-form-urlencoded
 app.use(bodyParser.json()) // application/json
@@ -34,10 +35,10 @@ app.use((error, req, res, next) => {
     })
 })
 
-mongoose.connect(MONGO_URI, { 
+mongoose.connect(config.MONGO_URI, { 
     useUnifiedTopology: true,
     useNewUrlParser: true
-}).then(result => {
+}).then(() => {
     console.log('ULTRON GONE ROGUE!!')
     app.listen(4000)
 }).catch(err => console.log(err))
