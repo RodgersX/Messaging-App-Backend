@@ -6,10 +6,13 @@ const User = require('../models/user')
 exports.getPosts = async (req, res, next) => {
   try {
     const posts = await Post.find()
-    res.status(200).json({
-      message: 'Fetched posts successfully',
-      posts: posts
-    })
+    if(posts) {
+      res.status(200).json({
+        message: 'Fetched posts successfully',
+        posts: posts
+      })
+    }
+    res.status(200).json({ message: 'No posts yet' })
   } catch(err) {
     if(!err.statusCode) {
       err.statusCode = 500
@@ -44,13 +47,14 @@ exports.createPost = async (req, res, next) => {
   try {
     await post.save()
     const user = await User.findById(req.userId)
-      user.posts.push(post)
-      await user.save()
-      res.status(201).json({
-        message: 'Post created successfully',
-        post: post,
-        creator: { _id: creator._id, name: creator.name }
-      })
+    creator = user
+    user.posts.push(post)
+    await user.save()
+    res.status(201).json({
+      message: 'Post created successfully',
+      post: post,
+      creator: { _id: creator._id, name: creator.name }
+    })
   } catch(err) {
     if(!err.statusCode) {
       err.statusCode = 500
@@ -92,28 +96,28 @@ exports.updatePost = async (req, res, next) => {
 
   const title = req.body.title
   const content = req.body.content
-   try {
-    const post = await Post.findById(postId)
-    if(!post) {
-      const error = new Error('Could not find post!')
-      error.statusCode = 404
-      // stops executing and goes to the next catch block
-      throw error
-    }
-    if(post.creator.toString() !== req.userId) {
-      const error = new Error('Unauthorized operation!')
-      error.statusCode = 403
-      throw error
-    }
-    post.title = title
-    post.content = content
+  try {
+  const post = await Post.findById(postId)
+  if(!post) {
+    const error = new Error('Could not find post!')
+    error.statusCode = 404
+    // stops executing and goes to the next catch block
+    throw error
+  }
+  if(post.creator.toString() !== req.userId) {
+    const error = new Error('Unauthorized operation!')
+    error.statusCode = 403
+    throw error
+  }
+  post.title = title
+  post.content = content
 
-    const result = await post.save()
-    res.status(200).json({
-      message: 'Post updated',
-      post: result
-    })
-   } catch(err) { // executes the error handling middleware in app.js
+  const result = await post.save()
+  res.status(200).json({
+    message: 'Post updated',
+    post: result
+  })
+  } catch(err) { // executes the error handling middleware in app.js
     if(!err.statusCode) { // use next() instead of throw
       err.statusCode = 500
     }
