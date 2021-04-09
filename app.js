@@ -7,7 +7,6 @@ const config = require('./.env/index')
 const feedRoutes = require('./routes/feed')
 const authRoutes = require('./routes/auth')
 
-
 const app = express()
 
 app.use(bodyParser.urlencoded({ extended: true })) // x-www-form-urlencoded
@@ -40,5 +39,5 @@ mongoose.connect(config.MONGO_URI, {
     useNewUrlParser: true
 }).then(() => {
     console.log('ULTRON GONE ROGUE!!')
-    app.listen(4000)
+    app.listen(config.PORT)
 }).catch(err => console.log(err))
